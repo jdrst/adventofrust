@@ -1,7 +1,5 @@
-use std::fs;
-
 fn main() {
-    let input = fs::read_to_string("01\\input.txt").expect("can't read file.");
+    let input = include_str!("input.txt");
 
     let depths: Vec<i32> = parse_input(input);
 
@@ -9,38 +7,20 @@ fn main() {
     println!("part two: {:?}", part2(&depths));
 }
 
-fn part1(depths: &[i32]) -> i32 {
-    let mut prev: &i32 = &depths[0];
-    let mut sum: i32 = 0;
-    for i in &depths[1..] {
-        if i > prev {
-            sum += 1;
-        }   
-        prev = i;
-    }
-    return sum
+fn part1(depths: &[i32]) -> usize {
+    depths.windows(2).filter(|pair| pair[0] < pair[1]).count()
 }
 
-fn part2(depths: &[i32]) -> i32 {
-    let mut prev: &i32 = &depths[0];
-    let mut sum: i32 = 0;
-    for (pos, i)  in depths[2..].iter().enumerate() {
-        if i > prev {
-            sum += 1;
-        }   
-        prev = &depths[pos];
-    }
-    return sum
+fn part2(depths: &[i32]) -> usize {
+    depths.windows(4).filter(|pair| pair[0] < pair[3]).count()
 }
 
-fn parse_input(input: String) -> Vec<i32> {
+fn parse_input(input: &str) -> Vec<i32> {
     input.split_whitespace().map(|l| l.parse().unwrap()).collect()
 }
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
-
     use crate::{part1, parse_input, part2};
 
     const TESTINPUT: &str = "199
@@ -56,29 +36,29 @@ mod tests {
 
     #[test]
     fn test_part1() {
-        let expected: i32 = 7;
-        let actual: i32 = part1(&parse_input(TESTINPUT.to_string()));
+        let expected: usize = 7;
+        let actual: usize = part1(&parse_input(TESTINPUT));
         assert_eq!(actual, expected);
     }
 
     #[test]
     fn test_part2() {
-        let expected: i32 = 6;
-        let actual: i32 = part2(&parse_input(TESTINPUT.to_string()));
+        let expected: usize = 5;
+        let actual: usize = part2(&parse_input(TESTINPUT));
         assert_eq!(actual, expected);
     }
 
     #[test]
     fn test_part1_with_input() {
-        let expected: i32 = 1162;
-        let actual: i32 = part2(&parse_input(fs::read_to_string("01\\input.txt").expect("can't read file.")));
+        let expected: usize = 1162;
+        let actual: usize = part1(&parse_input(include_str!("input.txt")));
         assert_eq!(actual, expected);
     }
 
     #[test]
     fn test_part2_with_input() {
-        let expected: i32 = 1190;
-        let actual: i32 = part2(&parse_input(fs::read_to_string("01\\input.txt").expect("can't read file.")));
+        let expected: usize = 1190;
+        let actual: usize = part2(&parse_input(include_str!("input.txt")));
         assert_eq!(actual, expected);
     }
 }
