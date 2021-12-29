@@ -9,9 +9,17 @@ edition = "2021"
 #itertools = "0.10.1"
 
 [[bin]]
-name = "01"
-path = "src/01/main.rs"
+name = "2021-01"
+path = "src/2021/01/main.rs"
 
 [[bin]]
-name = "02"
-path = "src/02/main.rs"
+name = "2021-02"
+path = "src/2021/02/main.rs"
+
+[[bin]]
+name = "2015-01"
+path = "src/2015/01/main.rs"
+
+[[bin]]
+name = "2015-02"
+path = "src/2015/02/main.rs"
