@@ -1,5 +1,5 @@
 fn main() {
-    let input = include_str!("input.txt");
+    let input = include_str!("../../inputs/01.txt");
 
     let depths: Vec<i32> = parse_input(input);
 
@@ -16,12 +16,15 @@ fn part2(depths: &[i32]) -> usize {
 }
 
 fn parse_input(input: &str) -> Vec<i32> {
-    input.split_whitespace().map(|l| l.parse().unwrap()).collect()
+    input
+        .split_whitespace()
+        .map(|l| l.parse().unwrap())
+        .collect()
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::{part1, parse_input, part2};
+    use crate::{parse_input, part1, part2};
 
     const TESTINPUT: &str = "199
     200

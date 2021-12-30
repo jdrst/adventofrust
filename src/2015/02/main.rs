@@ -1,7 +1,7 @@
 use std::cmp;
 
 fn main() {
-    let input = include_str!("../../02.txt");
+    let input = include_str!("../../inputs/02.txt");
 
     let boxes: Vec<Vec<i32>> = parse_input(input);
 
