@@ -9,25 +9,26 @@ fn get_input() -> String {
 }
 
 fn part1(input: &str) -> usize {
-    parse_input(input).into_iter().max().unwrap()
+    parse_input(input).last().unwrap().to_owned()
 }
 
 fn part2(input: &str) -> usize {
-    let mut vec = parse_input(input);
-    vec.sort();
-    let len = vec.len();
-    vec[len - 1] + vec[len - 2] + vec[len - 3]
+    let cals = parse_input(input);
+    let len = cals.len();
+    cals[len - 1] + cals[len - 2] + cals[len - 3]
 }
 
 fn parse_input(input: &str) -> Vec<usize> {
-    input
+    let mut cals: Vec<usize> = input
         .split("\n\n")
         .map(|l| {
             l.split("\n")
                 .map(|s| s.trim().parse::<usize>().unwrap())
                 .sum()
         })
-        .collect()
+        .collect();
+    cals.sort();
+    cals
 }
 
 #[cfg(test)]

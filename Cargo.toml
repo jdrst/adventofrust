@@ -18,6 +18,22 @@ name = "2022-02"
 path = "src/2022/02/main.rs"
 
 [[bin]]
+name = "2022-03"
+path = "src/2022/03/main.rs"
+
+[[bin]]
+name = "2022-04"
+path = "src/2022/04/main.rs"
+
+[[bin]]
+name = "2022-05"
+path = "src/2022/05/main.rs"
+
+[[bin]]
+name = "2022-06"
+path = "src/2022/06/main.rs"
+
+[[bin]]
 name = "2021-01"
 path = "src/2021/01/main.rs"
 
@@ -40,3 +56,7 @@ path = "src/2015/03/main.rs"
 [[bin]]
 name = "2015-04"
 path = "src/2015/04/main.rs"
+
+[[bin]]
+name = "2015-05"
+path = "src/2015/05/main.rs"
