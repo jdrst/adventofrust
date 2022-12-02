@@ -1,6 +1,6 @@
 use std::cmp::Ordering;
 
-#[derive(Eq, PartialEq, Clone)]
+#[derive(Eq, PartialEq, Clone, PartialOrd)]
 enum RPS {
     Rock,
     Paper,
@@ -16,15 +16,11 @@ fn main() {
 }
 
 fn part1(input: &str) -> usize {
-    parse_input1(input)
-        .iter()
-        .fold(0, |acc, m| m.score() + m.1.score() + acc)
+    parse_input1(input).iter().fold(0, |acc, m| m.score() + acc)
 }
 
 fn part2(input: &str) -> usize {
-    parse_input2(input)
-        .iter()
-        .fold(0, |acc, m| m.score() + m.1.score() + acc)
+    parse_input2(input).iter().fold(0, |acc, m| m.score() + acc)
 }
 
 fn parse_input1(input: &str) -> Vec<Match> {
@@ -46,8 +42,8 @@ fn parse_input2(input: &str) -> Vec<Match> {
             let elf = RPS::from_char(l.chars().nth(0).unwrap());
             let me = match l.chars().nth(2).unwrap() {
                 'Y' => elf.clone(),
-                'X' => elf.lose(),
-                'Z' => elf.win(),
+                'X' => elf.win(),
+                'Z' => elf.lose(),
                 _ => panic!("Oh no."),
             };
             Match(elf, me)
@@ -58,9 +54,9 @@ fn parse_input2(input: &str) -> Vec<Match> {
 impl Match {
     fn score(&self) -> usize {
         match self.0.cmp(&self.1) {
-            Ordering::Less => 6,
-            Ordering::Equal => 3,
-            Ordering::Greater => 0,
+            Ordering::Less => 6 + self.1.score(),
+            Ordering::Equal => 3 + self.1.score(),
+            Ordering::Greater => 0 + self.1.score(),
         }
     }
 }
@@ -71,7 +67,7 @@ impl RPS {
             'A' | 'X' => Self::Rock,
             'B' | 'Y' => Self::Paper,
             'C' | 'Z' => Self::Scissors,
-            _ => panic!("Sorry, only classic rules!"),
+            _ => panic!("Sorry, classic rules only!"),
         }
     }
 
@@ -83,7 +79,7 @@ impl RPS {
         }
     }
 
-    fn win(&self) -> Self {
+    fn lose(&self) -> Self {
         match self {
             Self::Rock => Self::Paper,
             Self::Paper => Self::Scissors,
@@ -91,7 +87,7 @@ impl RPS {
         }
     }
 
-    fn lose(&self) -> Self {
+    fn win(&self) -> Self {
         match self {
             Self::Rock => Self::Scissors,
             Self::Paper => Self::Rock,
@@ -103,22 +99,16 @@ impl RPS {
 impl Ord for RPS {
     fn cmp(&self, other: &Self) -> Ordering {
         match (self, other) {
-            (Self::Rock, Self::Paper) => Ordering::Less,
-            (Self::Rock, Self::Rock) => Ordering::Equal,
-            (Self::Rock, Self::Scissors) => Ordering::Greater,
-            (Self::Paper, Self::Scissors) => Ordering::Less,
-            (Self::Paper, Self::Paper) => Ordering::Equal,
-            (Self::Paper, Self::Rock) => Ordering::Greater,
-            (Self::Scissors, Self::Rock) => Ordering::Less,
-            (Self::Scissors, Self::Scissors) => Ordering::Equal,
-            (Self::Scissors, Self::Paper) => Ordering::Greater,
+            (Self::Rock, Self::Paper)
+            | (Self::Paper, Self::Scissors)
+            | (Self::Scissors, Self::Rock) => Ordering::Less,
+            (Self::Rock, Self::Rock)
+            | (Self::Paper, Self::Paper)
+            | (Self::Scissors, Self::Scissors) => Ordering::Equal,
+            (Self::Paper, Self::Rock)
+            | (Self::Rock, Self::Scissors)
+            | (Self::Scissors, Self::Paper) => Ordering::Greater,
         }
-    }
-}
-
-impl PartialOrd for RPS {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
     }
 }
 
