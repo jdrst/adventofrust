@@ -12,7 +12,7 @@ pub fn part1(input: &str) -> usize {
     input
         .lines()
         .map(|l| get_first_duplicate(l.split_at(l.len() / 2)))
-        .map(|c| get_priority(&c))
+        .map(|c| get_priority(c))
         .sum()
 }
 
@@ -30,14 +30,14 @@ pub fn part2(input: &str) -> usize {
                         .all(|sack| sack.chars().any(|other_item| other_item == *item))
                 })
                 .unwrap();
-            acc + get_priority(&badge)
+            acc + get_priority(badge)
         })
 }
 
-fn get_priority(c: &char) -> usize {
-    match *c as u8 {
-        41..=90 => *c as usize - 38,
-        61..=122 => *c as usize - 96,
+fn get_priority(c: char) -> usize {
+    match c as u8 {
+        41..=90 => c as usize - 38,
+        61..=122 => c as usize - 96,
         _ => panic!("not an ASCII char in [a-zA-Z]"),
     }
 }
