@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-
 pub fn main() {
     let input = get_input();
     println!("part one: {:?}", part1(&input));
@@ -13,47 +11,42 @@ fn get_input() -> String {
 pub fn part1(input: &str) -> usize {
     input
         .lines()
-        .map(|l| get_duplicates(l))
-        .map(|db| db.iter().map(|c| get_priority(c)).sum::<usize>())
+        .map(|l| get_first_duplicate(l.split_at(l.len() / 2)))
+        .map(|c| get_priority(&c))
         .sum()
 }
 
 pub fn part2(input: &str) -> usize {
-    let groups = input
+    input
         .lines()
-        .map(|l| {
-            let mut chars = HashSet::new();
-            for c in l.chars() {
-                chars.insert(c);
-            }
-            chars
+        .collect::<Vec<&str>>()
+        .chunks(3)
+        .fold(0, |acc, sacks| {
+            let badge = sacks[0]
+                .chars()
+                .find(|item| {
+                    sacks[1..]
+                        .iter()
+                        .all(|sack| sack.chars().any(|other_item| other_item == *item))
+                })
+                .unwrap();
+            acc + get_priority(&badge)
         })
-        .collect::<Vec<HashSet<char>>>();
-    let mut res = 0;
-    for group in groups.chunks(3) {
-        let badge: HashSet<&char> = group[0]
-            .iter()
-            .filter(|e| group[1..].iter().all(|other| other.contains(*e)))
-            .collect();
-        res += get_priority(*badge.iter().last().unwrap());
-    }
-    res
 }
 
 fn get_priority(c: &char) -> usize {
     match *c as u8 {
         41..=90 => *c as usize - 38,
         61..=122 => *c as usize - 96,
-        _ => panic!("not an ascii char"),
+        _ => panic!("not an ASCII char in [a-zA-Z]"),
     }
 }
 
-fn get_duplicates(line: &str) -> HashSet<char> {
-    let mid = line.len() / 2;
-    let first: HashSet<char> = line.chars().take(mid).collect();
-    let second: HashSet<char> = line.chars().skip(mid).collect();
-    // first.intersection(&second).cloned().collect()
-    first.into_iter().filter(|c| second.contains(c)).collect()
+fn get_first_duplicate((first, second): (&str, &str)) -> char {
+    first
+        .chars()
+        .find(|c| second.chars().any(|b| b == *c))
+        .unwrap()
 }
 
 #[cfg(test)]
