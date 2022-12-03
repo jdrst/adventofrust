@@ -1,4 +1,4 @@
-fn main() {
+pub fn main() {
     let input = get_input();
     println!("part one: {:?}", part1(&input));
     println!("part two: {:?}", part2(&input));
@@ -8,11 +8,11 @@ fn get_input() -> String {
     include_str!("../../inputs/01.txt").replace("\r", "")
 }
 
-fn part1(input: &str) -> usize {
+pub fn part1(input: &str) -> usize {
     parse_input(input).last().unwrap().to_owned()
 }
 
-fn part2(input: &str) -> usize {
+pub fn part2(input: &str) -> usize {
     let cals = parse_input(input);
     let len = cals.len();
     cals[len - 1] + cals[len - 2] + cals[len - 3]

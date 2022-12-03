@@ -9,17 +9,17 @@ enum RPS {
 
 struct Match(RPS, RPS);
 
-fn main() {
+pub fn main() {
     let input = get_input();
     println!("part one: {:?}", part1(&input));
     println!("part two: {:?}", part2(&input));
 }
 
-fn part1(input: &str) -> usize {
+pub fn part1(input: &str) -> usize {
     parse_input1(input).iter().fold(0, |acc, m| m.score() + acc)
 }
 
-fn part2(input: &str) -> usize {
+pub fn part2(input: &str) -> usize {
     parse_input2(input).iter().fold(0, |acc, m| m.score() + acc)
 }
 

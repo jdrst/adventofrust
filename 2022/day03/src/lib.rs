@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-fn main() {
+pub fn main() {
     let input = get_input();
     println!("part one: {:?}", part1(&input));
     println!("part two: {:?}", part2(&input));
@@ -10,7 +10,7 @@ fn get_input() -> String {
     include_str!("../../inputs/03.txt").replace("\r", "")
 }
 
-fn part1(input: &str) -> usize {
+pub fn part1(input: &str) -> usize {
     input
         .lines()
         .map(|l| get_duplicates(l))
@@ -18,7 +18,7 @@ fn part1(input: &str) -> usize {
         .sum()
 }
 
-fn part2(input: &str) -> usize {
+pub fn part2(input: &str) -> usize {
     let groups = input
         .lines()
         .map(|l| {
