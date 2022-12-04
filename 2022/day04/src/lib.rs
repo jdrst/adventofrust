@@ -1,5 +1,3 @@
-use std::{collections::HashSet, hash::Hash, ops::Range};
-
 pub fn main() {
     let input = get_input();
     println!("part one: {:?}", part1(&input));
@@ -11,52 +9,53 @@ pub fn get_input() -> String {
 }
 
 pub fn part1(input: &str) -> usize {
-    input.lines().fold(0, |acc, l| {
-        let (first, second) = l.split_once(',').unwrap();
-        let a = create_set(first);
-        let b = create_set(second);
-
-        if contains(&a, &b) || contains(&b, &a) {
-            return acc + 1;
-        };
-        acc
-    })
+    input
+        .as_bytes()
+        .split(|&b| b == b'\n')
+        .filter(|pair| is_fully_containing(pair))
+        .count()
 }
 
 pub fn part2(input: &str) -> usize {
-    input.lines().fold(0, |acc, l| {
-        let (first, second) = l.split_once(',').unwrap();
-        let a = create_set(first);
-        let b = create_set(second);
-
-        if a.intersection(&b).count() > 0 {
-            return acc + 1;
-        };
-        acc
-    })
+    input
+        .as_bytes()
+        .split(|&b| b == b'\n')
+        .filter(|pair| is_overlapping(pair))
+        .count()
 }
 
-fn contains<T: Eq + Hash>(first: &HashSet<T>, second: &HashSet<T>) -> bool {
-    for a in first {
-        if !second.contains(&a) {
-            return false;
-        }
-    }
-    return true;
+fn is_fully_containing(pair: &[u8]) -> bool {
+    let sections: Vec<u128> = pair
+        .split(|&b| b == b',')
+        .map(|elf| get_section(elf))
+        .collect();
+    sections[0] & sections[1] == sections[0] || sections[0] & sections[1] == sections[1]
 }
 
-fn create_set(s: &str) -> HashSet<usize> {
-    if let Some((start, end)) = s.split_once('-') {
-        Range {
-            start: start.parse::<usize>().unwrap(),
-            end: end.parse::<usize>().unwrap() + 1,
+fn is_overlapping(pair: &[u8]) -> bool {
+    pair.split(|&b| b == b',')
+        .map(|elf| get_section(elf))
+        .fold(u128::MAX, |overlap, elf| overlap & elf)
+        > 0
+}
+
+fn get_section(e: &[u8]) -> u128 {
+    if e.contains(&b'-') {
+        let mut res = 0u128;
+        let bounds: Vec<usize> = e.split(|&b| b == b'-').map(|e| to_integer(e)).collect();
+        for i in bounds[0]..=bounds[1] {
+            res = res | 1u128 << i
         }
-        .collect::<HashSet<usize>>()
+        res
     } else {
-        let mut set = HashSet::new();
-        set.insert(s.parse::<usize>().unwrap());
-        set
+        1u128 << to_integer(e)
     }
+}
+
+fn to_integer(bytes: &[u8]) -> usize {
+    bytes
+        .iter()
+        .fold(0, |acc, b| (acc * 10) + (b - b'0') as usize)
 }
 
 #[cfg(test)]
