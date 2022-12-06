@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-
 pub fn main() {
     let input = get_input();
     println!("part one: {:?}", part1(&input));
@@ -20,14 +18,24 @@ pub fn part2(input: &str) -> usize {
 
 pub fn process_window(input: &str, window_size: usize) -> usize {
     let mut processed = 0;
-    for four in input.as_bytes().windows(window_size) {
-        let mut set = HashSet::new();
-        if four.iter().all(|b| set.insert(b)) {
+    for window in input.as_bytes().windows(window_size) {
+        if only_uniques_in(window, window_size) {
             break;
         }
         processed += 1;
     }
     processed + window_size
+}
+
+pub fn only_uniques_in(window: &[u8], window_size: usize) -> bool {
+    for i in 0..window_size {
+        for k in i + 1..window_size {
+            if window[i] == window[k] {
+                return false;
+            }
+        }
+    }
+    true
 }
 
 #[cfg(test)]
