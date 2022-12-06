@@ -31,8 +31,8 @@ pub fn part2(input: &str) -> String {
         .map(|l| Move::from_line(l))
         .for_each(|m| {
             let amount = stacks[m.from - 1].len() - m.amount..;
-            let crates: Vec<char> = stacks[m.from - 1].drain(amount).collect();
-            stacks[m.to - 1].extend(crates);
+            let mut crates: Vec<char> = stacks[m.from - 1].drain(amount).collect();
+            stacks[m.to - 1].append(&mut crates);
         });
     stacks.iter_mut().map(|s| s.pop().unwrap_or(' ')).collect()
 }
