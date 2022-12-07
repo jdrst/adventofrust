@@ -9,6 +9,7 @@ fn main() {
         ("04", day04::main),
         ("05", day05::main),
         ("06", day06::main),
+        ("07", day07::main),
     ]);
     if args.len() == 1 {
         fns.iter().for_each(|(k, v)| {
