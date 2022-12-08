@@ -1,4 +1,4 @@
-use std::{iter::Peekable, str::Lines};
+use std::str::Lines;
 
 pub fn main() {
     let input = get_input();
@@ -11,19 +11,25 @@ pub fn get_input() -> String {
 }
 
 pub fn part1(input: &str) -> usize {
-    let (_, inp) = input.split_once("\n").unwrap();
-    let mut top_level = Vec::new();
-    let mut sub_levels = Vec::new();
-    walk_dir(&mut inp.lines().peekable(), &mut top_level, &mut sub_levels);
-    sub_levels.iter().filter(|s| **s <= 100000).sum::<usize>()
-        + top_level.iter().filter(|s| **s <= 100000).sum::<usize>()
+    let dirs = walk_dir(&mut input.lines(), Vec::new(), Vec::new());
+    dirs.iter().filter(|s| **s <= 100000).sum::<usize>()
+}
+pub fn part2(input: &str) -> usize {
+    let dirs = walk_dir(&mut input.lines(), Vec::new(), Vec::new());
+    let used_space = dirs.last().unwrap();
+    let free_space_needed = 30000000 - (70000000 - used_space);
+    dirs.iter()
+        .filter(|s| **s >= free_space_needed)
+        .min()
+        .unwrap()
+        .to_owned()
 }
 
 pub fn walk_dir(
-    lines: &mut Peekable<Lines>,
-    current_sizes: &mut Vec<usize>,
-    all_dirs: &mut Vec<usize>,
-) -> usize {
+    lines: &mut Lines,
+    mut current_sizes: Vec<usize>,
+    mut all_dirs: Vec<usize>,
+) -> Vec<usize> {
     if let Some(curr) = lines.next() {
         if curr.starts_with("$") {
             match curr.trim() {
@@ -33,7 +39,7 @@ pub fn walk_dir(
                     all_dirs.push(current_dir_size);
                     *current_sizes
                         .last_mut()
-                        .expect("there is no last current size 1") += current_dir_size;
+                        .expect("there is no last current size") += current_dir_size;
                     return walk_dir(lines, current_sizes, all_dirs);
                 }
                 "$ ls" => {
@@ -55,22 +61,11 @@ pub fn walk_dir(
             size.parse::<usize>().expect("not a filesize");
         return walk_dir(lines, current_sizes, all_dirs);
     }
-    0
-}
-
-pub fn part2(input: &str) -> usize {
-    let (_, inp) = input.split_once("\n").unwrap();
-    let mut top_level = Vec::new();
-    let mut sub_levels = Vec::new();
-    walk_dir(&mut inp.lines().peekable(), &mut top_level, &mut sub_levels);
-    let used_space: usize = top_level.iter().sum();
-    let free_space_needed = 30000000 - (70000000 - used_space);
-    top_level.append(&mut sub_levels);
-    *top_level[1..] //we don't need root
-        .iter()
-        .filter(|s| **s >= free_space_needed)
-        .min()
-        .unwrap()
+    //handle top level directory
+    let root: usize = current_sizes.iter().sum();
+    all_dirs.extend_from_slice(&current_sizes[1..]);
+    all_dirs.push(root);
+    all_dirs
 }
 
 #[cfg(test)]
