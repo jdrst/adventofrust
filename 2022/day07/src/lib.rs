@@ -11,11 +11,11 @@ pub fn get_input() -> String {
 }
 
 pub fn part1(input: &str) -> usize {
-    let dirs = walk_dir(&mut input.lines(), Vec::new(), Vec::new());
+    let dirs = walk_dir(&mut input.lines());
     dirs.iter().filter(|s| **s <= 100000).sum::<usize>()
 }
 pub fn part2(input: &str) -> usize {
-    let dirs = walk_dir(&mut input.lines(), Vec::new(), Vec::new());
+    let dirs = walk_dir(&mut input.lines());
     let used_space = dirs.last().unwrap();
     let free_space_needed = 30000000 - (70000000 - used_space);
     dirs.iter()
@@ -25,14 +25,15 @@ pub fn part2(input: &str) -> usize {
         .to_owned()
 }
 
-pub fn walk_dir(
-    lines: &mut Lines,
-    mut current_sizes: Vec<usize>,
-    mut all_dirs: Vec<usize>,
-) -> Vec<usize> {
-    if let Some(curr) = lines.next() {
-        if curr.starts_with("$") {
-            match curr.trim() {
+pub fn walk_dir(lines: &mut Lines) -> Vec<usize> {
+    let mut current_sizes = Vec::new();
+    let mut all_dirs = Vec::new();
+    for line in lines {
+        if line.starts_with("dir") {
+            continue;
+        }
+        if line.starts_with("$") {
+            match line.trim() {
                 "$ cd .." => {
                     let current_dir_size =
                         current_sizes.pop().expect("there is no current dir size");
@@ -40,26 +41,20 @@ pub fn walk_dir(
                     *current_sizes
                         .last_mut()
                         .expect("there is no last current size") += current_dir_size;
-                    return walk_dir(lines, current_sizes, all_dirs);
                 }
                 "$ ls" => {
                     current_sizes.push(0);
-                    return walk_dir(lines, current_sizes, all_dirs);
                 }
-                _ => {
-                    return walk_dir(lines, current_sizes, all_dirs);
-                }
+                _ => {}
             }
+            continue;
         }
-        if curr.starts_with("dir") {
-            return walk_dir(lines, current_sizes, all_dirs);
-        }
-        let (size, _) = curr.split_once(" ").expect("not a file entry");
+        let (size, _) = line.split_once(" ").expect("not a file entry");
         *current_sizes
             .last_mut()
             .expect("there is no last current size") +=
             size.parse::<usize>().expect("not a filesize");
-        return walk_dir(lines, current_sizes, all_dirs);
+        continue;
     }
     //handle top level directory
     let root: usize = current_sizes.iter().sum();
