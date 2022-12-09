@@ -19,7 +19,9 @@ pub fn part1(input: &str) -> usize {
         let max = amount.parse::<usize>().unwrap();
         for _ in 0..max {
             head_pos.move_in(direction);
-            tail_pos.move_to_if_necessary(&head_pos);
+            if !tail_pos.is_in_range_of(&head_pos) {
+                tail_pos.move_to_if_necessary(&head_pos);
+            }
             visited.insert(tail_pos);
         }
     }
@@ -43,8 +45,10 @@ pub fn part2(input: &str) -> usize {
 
 fn move_rope(rope: &mut Vec<Point>) -> Point {
     for i in 1..rope.len() {
-        let before = rope[i - 1];
-        rope[i].move_to_if_necessary(&before);
+        if !rope[i].is_in_range_of(&rope[i - 1]) {
+            let before = rope[i - 1];
+            rope[i].move_to_if_necessary(&before);
+        }
     }
     rope[9]
 }
@@ -64,18 +68,16 @@ impl Point {
     }
 
     fn move_to_if_necessary(&mut self, other: &Point) {
-        if !self.is_in_range_of(other) {
-            // signum returns -1 for neg. numbers and +1 for pos. numbers and 0 for 0
-            // that means
-            //    if other.x is less than self.x
-            //    we subtract 1 from self.x
-            //    or else
-            //    we add 1 to self.x
-            // or in different words
-            // we move self.x towards other.x
-            self.0 = self.0 + (other.0 - self.0).signum();
-            self.1 = self.1 + (other.1 - self.1).signum();
-        }
+        // signum returns -1 for neg. numbers and +1 for pos. numbers and 0 for 0
+        // that means
+        //    if other.x is less than self.x
+        //    we subtract 1 from self.x
+        //    or else
+        //    we add 1 to self.x
+        // or in different words
+        // we move self.x towards other.x
+        self.0 = self.0 + (other.0 - self.0).signum();
+        self.1 = self.1 + (other.1 - self.1).signum();
     }
 
     fn is_in_range_of(self, other: &Point) -> bool {
