@@ -8,51 +8,16 @@ pub fn get_input() -> String {
     include_str!("../../inputs/10.txt").replace("\r", "")
 }
 
-#[derive(Debug)]
-enum Instruction {
-    Noop,
-    Add(isize),
-}
-
 pub fn part1(input: &str) -> isize {
-    let mut cycle = 0usize;
-    let instructions = get_instructions(input);
-    let mut inst_iter = instructions.iter().skip(1).peekable();
-    let mut current_instruction = &instructions[0];
-    let mut instruction_done_at = match instructions[0] {
-        Instruction::Noop => 1usize,
-        Instruction::Add(_) => 2usize,
-    };
-    let mut register = 1isize;
     let mut signal_sum = 0isize;
-    loop {
-        if let None = inst_iter.peek() {
-            break;
-        }
-        cycle += 1;
-        match cycle {
-            20 | 60 | 100 | 140 | 180 | 220 => signal_sum += cycle as isize * register,
-            _ => {}
-        }
-        if instruction_done_at == cycle {
-            match current_instruction {
-                Instruction::Add(num) => {
-                    register += num;
-                    current_instruction = inst_iter.next().unwrap();
-                    match current_instruction {
-                        Instruction::Noop => instruction_done_at = cycle + 1,
-                        Instruction::Add(_) => instruction_done_at = cycle + 2,
-                    }
-                }
-                Instruction::Noop => {
-                    current_instruction = inst_iter.next().unwrap();
-                    match current_instruction {
-                        Instruction::Noop => instruction_done_at = cycle + 1,
-                        Instruction::Add(_) => instruction_done_at = cycle + 2,
-                    }
-                }
+    let mut cpu = CPU::new(get_instructions(input));
+    while cpu.has_instructions() {
+        cpu.do_cycle();
+        match cpu.cycle + 1 {
+            20 | 60 | 100 | 140 | 180 | 220 => {
+                signal_sum += (cpu.cycle + 1) as isize * cpu.register
             }
-        } else {
+            _ => {}
         }
     }
     signal_sum
@@ -60,56 +25,82 @@ pub fn part1(input: &str) -> isize {
 
 pub fn part2(input: &str) -> String {
     let mut crt = String::new();
-    let mut cycle = 0usize;
-    let instructions = get_instructions(input);
-    let mut inst_iter = instructions.iter().skip(1).peekable();
-    let mut current_instruction = &instructions[0];
-    let mut instruction_done_at = match instructions[0] {
-        Instruction::Noop => 1usize,
-        Instruction::Add(_) => 2usize,
-    };
-    let mut register = 1isize;
-    loop {
-        cycle += 1;
-        if cycle > 1 && (cycle - 1) % 40 == 0 {
-            crt += "\n";
-        }
-        let current_pixel = (cycle - 1) % 40;
-        if register - 1 == current_pixel as isize
-            || register == current_pixel as isize
-            || register + 1 == current_pixel as isize
-        {
-            crt += "#"
-        } else {
-            crt += "."
-        }
-
-        if let None = inst_iter.peek() {
-            break;
-        }
-
-        if instruction_done_at == cycle {
-            match current_instruction {
-                Instruction::Add(num) => {
-                    register += num;
-                    current_instruction = inst_iter.next().unwrap();
-                    match current_instruction {
-                        Instruction::Noop => instruction_done_at = cycle + 1,
-                        Instruction::Add(_) => instruction_done_at = cycle + 2,
-                    }
-                }
-                Instruction::Noop => {
-                    current_instruction = inst_iter.next().unwrap();
-                    match current_instruction {
-                        Instruction::Noop => instruction_done_at = cycle + 1,
-                        Instruction::Add(_) => instruction_done_at = cycle + 2,
-                    }
-                }
-            }
-        } else {
-        }
+    let mut cpu = CPU::new(get_instructions(input));
+    while cpu.has_instructions() {
+        cpu.draw_pixel(&mut crt);
+        cpu.do_cycle();
     }
     crt
+}
+
+#[derive(Debug)]
+enum Instruction {
+    Noop,
+    Add(isize),
+}
+
+struct CPU {
+    cycle: usize,
+    instructions: Vec<Instruction>,
+    next_instruction_at: usize,
+    current_instruction: usize,
+    register: isize,
+}
+
+impl CPU {
+    fn new(instructions: Vec<Instruction>) -> Self {
+        let next_instruction_at = match instructions[0] {
+            Instruction::Noop => 1usize,
+            Instruction::Add(_) => 2usize,
+        };
+        Self {
+            cycle: 0,
+            instructions,
+            next_instruction_at,
+            current_instruction: 0,
+            register: 1,
+        }
+    }
+
+    fn do_cycle(&mut self) {
+        self.cycle += 1;
+        if self.next_instruction_at == self.cycle {
+            match self.instructions[self.current_instruction] {
+                Instruction::Noop => {
+                    self.current_instruction += 1;
+                }
+                Instruction::Add(num) => {
+                    self.register += num;
+                    self.current_instruction += 1;
+                }
+            }
+            self.set_next_instruction_at();
+        }
+    }
+
+    fn draw_pixel(&self, crt: &mut String) {
+        if self.cycle > 1 && self.cycle % 40 == 0 {
+            crt.push('\n');
+        }
+        let current_pixel = self.cycle % 40;
+        match (self.register - current_pixel as isize).abs() {
+            n if n < 2 => crt.push('#'),
+            _ => crt.push('.'),
+        }
+    }
+
+    fn set_next_instruction_at(&mut self) {
+        if self.has_instructions() {
+            match self.instructions[self.current_instruction] {
+                Instruction::Noop => self.next_instruction_at = self.cycle + 1,
+                Instruction::Add(_) => self.next_instruction_at = self.cycle + 2,
+            }
+        }
+    }
+
+    fn has_instructions(&self) -> bool {
+        self.current_instruction < self.instructions.len()
+    }
 }
 
 fn get_instructions(input: &str) -> Vec<Instruction> {
