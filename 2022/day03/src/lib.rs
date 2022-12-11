@@ -4,7 +4,7 @@ pub fn main() {
     println!("part two: {:?}", part2(&input));
 }
 
-fn get_input() -> String {
+pub fn get_input() -> String {
     include_str!("../../inputs/03.txt").replace("\r", "")
 }
 

@@ -112,7 +112,7 @@ impl Ord for RPS {
     }
 }
 
-fn get_input() -> String {
+pub fn get_input() -> String {
     include_str!("../../inputs/02.txt").replace("\r", "")
 }
 
