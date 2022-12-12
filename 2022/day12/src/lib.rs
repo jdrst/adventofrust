@@ -1,4 +1,4 @@
-use std::collections::{BinaryHeap, HashMap};
+use std::collections::{BinaryHeap, HashMap, HashSet};
 
 pub fn main() {
     let input = get_input();
@@ -18,17 +18,8 @@ pub fn part1(input: &str) -> usize {
 
 pub fn part2(input: &str) -> usize {
     let (grid, (_, end)) = make_grid(input);
-    grid.iter()
-        .enumerate()
-        .flat_map(|(y, v)| {
-            v.iter()
-                .enumerate()
-                .filter(|(_, c)| *c == &0)
-                .map(move |(x, _)| Coordinate::new(x, y))
-        })
-        .filter_map(|s| a_star(s, end, &grid))
-        .min()
-        .unwrap()
+
+    bfs(end, 0, &grid).unwrap()
 }
 
 #[derive(PartialEq, Eq, Hash, PartialOrd, Ord, Copy, Clone, Debug)]
@@ -88,7 +79,11 @@ impl Coordinate {
     }
 
     fn is_allowed_move(&self, to: &Coordinate, grid: &Vec<Vec<u8>>) -> bool {
-        grid[self.y][self.x] + 1 >= grid[to.y][to.x]
+        self.get_height(grid) + 1 >= to.get_height(grid)
+    }
+
+    fn get_height(&self, grid: &Vec<Vec<u8>>) -> u8 {
+        grid[self.y][self.x]
     }
 }
 
@@ -108,14 +103,41 @@ fn a_star(start: Coordinate, end: Coordinate, grid: &Vec<Vec<u8>>) -> Option<usi
         }
 
         for neighbour in position.possible_steps(grid) {
-            let cost_to_neighbour = cost_to.get(&position).unwrap_or(&usize::MAX) + 1 as usize; //distance is always 1
-            let best_cost_to_neighbour = cost_to.get(&neighbour).unwrap_or(&usize::MAX);
+            let cost_to_neighbour = cost_to.get(&position).unwrap_or(&usize::MAX) + 1; //distance is always 1
+            let best_known_cost_to_neighbour = cost_to.get(&neighbour).unwrap_or(&usize::MAX);
 
-            if cost_to_neighbour < *best_cost_to_neighbour {
+            if cost_to_neighbour < *best_known_cost_to_neighbour {
                 cost_to.insert(neighbour, cost_to_neighbour);
                 heap.push(State {
                     cost: cost_to_neighbour + manhattan(neighbour, end),
                     position: neighbour,
+                });
+            }
+        }
+    }
+    None
+}
+
+fn bfs(start: Coordinate, target_height: u8, grid: &Vec<Vec<u8>>) -> Option<usize> {
+    let mut heap = BinaryHeap::<State>::new();
+    let mut visited = HashSet::<Coordinate>::new();
+
+    heap.push(State {
+        cost: 0,
+        position: start,
+    });
+
+    while let Some(State { cost, position }) = heap.pop() {
+        let pos_height = position.get_height(grid);
+        if pos_height == target_height {
+            return Some(cost);
+        };
+        for next in position.neighbours_in_bounds(grid) {
+            if next.get_height(grid) + 1 >= pos_height && !visited.contains(&next) {
+                visited.insert(next);
+                heap.push(State {
+                    cost: cost + 1,
+                    position: next,
                 });
             }
         }
