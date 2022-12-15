@@ -75,9 +75,9 @@ fn do_thing_with_grow(
                     //do grow
                     for y in 0..=bottom {
                         if y == bottom {
-                            cave[y].append(&mut vec![true; 10]);
+                            cave[y].append(&mut vec![true; 100]);
                         } else {
-                            cave[y].append(&mut vec![false; 10]);
+                            cave[y].append(&mut vec![false; 100]);
                         }
                     }
                 }
