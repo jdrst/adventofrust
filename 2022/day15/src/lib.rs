@@ -12,20 +12,15 @@ pub fn get_input() -> String {
 
 pub fn part1(input: &str, y_pos: isize) -> isize {
     let sensors = parse_input(input);
-    let (leftmost_x, _) = sensors.iter().fold((0, 0), |(min_x, min_y), b| {
-        let (lmx, lmy) = b.get_leftmost_point();
-        (min_x.min(lmx), min_y.min(lmy))
-    });
-    let (rightmost_x, _) = sensors.iter().fold((0, 0), |(max_x, max_y), b| {
-        let (rmx, rmy) = b.get_rightmost_point();
-        (max_x.max(rmx), max_y.max(rmy))
-    });
-    let mut sum = 0;
     let mut ranges = Vec::new();
     let mut beacons_in_line = HashSet::new();
+    let mut leftmost_x = 0;
+    let mut rightmost_x = 0;
     for sensor in sensors.iter() {
         let min_x = sensor.left_uncovered_x(y_pos) + 1;
         let max_x = sensor.right_uncovered_x_for(y_pos) - 1;
+        leftmost_x = leftmost_x.min(min_x);
+        rightmost_x = rightmost_x.max(max_x);
         if min_x < max_x {
             ranges.push(min_x..=max_x);
             if sensor.closest_beacon.y == y_pos {
@@ -33,6 +28,7 @@ pub fn part1(input: &str, y_pos: isize) -> isize {
             }
         }
     }
+    let mut sum = 0;
     for x in leftmost_x..=rightmost_x {
         if ranges.iter().any(|r| r.contains(&x)) {
             sum += 1;
