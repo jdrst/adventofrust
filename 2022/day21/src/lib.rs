@@ -106,33 +106,24 @@ impl Monkey {
             match &monkey.job {
                 Job::Yell(_) => unreachable!(),
                 Job::Add(a, b) => {
-                    if after == a {
-                        value_before = value_before - monkeys.get(b).unwrap().do_job(monkeys);
-                    } else {
-                        value_before = value_before - monkeys.get(a).unwrap().do_job(monkeys);
-                    }
+                    let monkey_with_job = if after == a { b } else { a };
+                    value_before =
+                        value_before - monkeys.get(monkey_with_job).unwrap().do_job(monkeys);
                 }
                 Job::Subtract(a, b) => {
-                    if after == a {
-                        value_before = value_before + monkeys.get(b).unwrap().do_job(monkeys);
-                    } else {
-                        value_before = value_before - monkeys.get(a).unwrap().do_job(monkeys);
-                        value_before = value_before * -1;
-                    }
+                    let (mult, monkey_with_job) = if after == a { (1, b) } else { (-1, a) };
+                    value_before =
+                        mult * value_before + monkeys.get(monkey_with_job).unwrap().do_job(monkeys);
                 }
                 Job::Multiply(a, b) => {
-                    if after == a {
-                        value_before = value_before / monkeys.get(b).unwrap().do_job(monkeys);
-                    } else {
-                        value_before = value_before / monkeys.get(a).unwrap().do_job(monkeys);
-                    }
+                    let monkey_with_job = if after == a { b } else { a };
+                    value_before =
+                        value_before / monkeys.get(monkey_with_job).unwrap().do_job(monkeys);
                 }
                 Job::Divide(a, b) => {
-                    if after == a {
-                        value_before = value_before * monkeys.get(b).unwrap().do_job(monkeys);
-                    } else {
-                        value_before = value_before * monkeys.get(a).unwrap().do_job(monkeys);
-                    }
+                    let monkey_with_job = if after == a { b } else { a };
+                    value_before =
+                        value_before * monkeys.get(monkey_with_job).unwrap().do_job(monkeys);
                 }
             }
             next = after;
