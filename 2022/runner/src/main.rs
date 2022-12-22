@@ -24,6 +24,7 @@ fn main() {
         ("19", day19::main),
         ("20", day20::main),
         ("21", day21::main),
+        ("22", day22::main),
         ("23", day23::main),
     ]);
     if args.len() == 1 {

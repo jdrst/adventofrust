@@ -93,14 +93,6 @@ impl Sensor {
             (self.closest_beacon.x, self.closest_beacon.y),
         )
     }
-
-    fn get_rightmost_point(&self) -> (isize, isize) {
-        (self.x + self.manhattan_to_beacon() as isize, self.y)
-    }
-
-    fn get_leftmost_point(&self) -> (isize, isize) {
-        (self.x - self.manhattan_to_beacon() as isize, self.y)
-    }
 }
 
 fn parse_input(input: &str) -> Vec<Sensor> {

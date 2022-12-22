@@ -142,6 +142,7 @@ fn simulate_cave_bit(input: &str, until_rocks_stopped: usize) -> usize {
     current_chamber_height + additional_chamber_height
 }
 
+#[allow(dead_code)]
 fn draw_bit_chamber(current_rock: &Vec<u8>, current_rock_pos: usize, chamber: &Vec<u8>) {
     let rock_height = current_rock.len();
     println![];
