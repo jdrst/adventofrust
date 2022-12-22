@@ -18,6 +18,7 @@ fn main() {
         ("13", day13::main),
         ("14", day14::main),
         ("15", day15::main),
+        ("16", day16::main),
         ("17", day17::main),
         ("18", day18::main),
         ("19", day19::main),
