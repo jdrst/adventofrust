@@ -176,13 +176,21 @@ fn criterion_benchmark(c: &mut Criterion) {
     // c.bench_function("day22/runtime/part2", |b| {
     //     b.iter(|| day22::part2(black_box(&day22::get_input())))
     // });
-    
+
     c.bench_function("day23/runtime/part1", |b| {
         b.iter(|| day23::part1(black_box(&day23::get_input())))
     });
 
     c.bench_function("day23/runtime/part2", |b| {
         b.iter(|| day23::part2(black_box(&day23::get_input())))
+    });
+
+    c.bench_function("day24/runtime/part1", |b| {
+        b.iter(|| day24::part1(black_box(&day24::get_input())))
+    });
+
+    c.bench_function("day24/runtime/part2", |b| {
+        b.iter(|| day24::part2(black_box(&day24::get_input())))
     });
 
     c.bench_function("day25/runtime/part1", |b| {
